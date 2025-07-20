@@ -28,6 +28,24 @@ public class QuizDbContext(DbContextOptions<QuizDbContext> options)
                 Id = 3,
                 Content = "Najvisi vrh Afrike?",
                 Answer = "Kilimandzaro"
+            },
+            new
+            {
+                Id = 4,
+                Content = "Najvisi vrh Juzne Amerike?",
+                Answer = "Akonkagva"
+            },
+            new
+            {
+                Id = 5,
+                Content = "Najvisi vrh Severne Amerike?",
+                Answer = "Denali/Makinli"
+            },
+            new
+            {
+                Id = 6,
+                Content = "Najvisi vrh Okeanije?",
+                Answer = "Koscusko"
             }
         );
     }
