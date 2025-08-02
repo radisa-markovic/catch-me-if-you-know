@@ -1,0 +1,27 @@
+<section class="center">
+    @if(this.playerCanStillAnswer() && this.questionSet.length !== 0) {
+    <form
+        #answerForm="ngForm"
+        (ngSubmit)="onAnswerGiven(answerForm)"
+    >
+        <time>{{answerTimer}}</time>
+        <h2>{{questionSet[currentQuestionNumber].content }}</h2>
+        <input
+            type="text"
+            name="enteredAnswer"
+            id="answerInput"
+            [(ngModel)]="enteredAnswer"
+        />
+        <button type="submit">
+            Potvrdi
+        </button>
+    </form>
+    <button (click)="onPassQuestion()">
+        Dalje
+    </button>
+    }
+    @else
+    {
+    <p>Gotov set od 6 pitanja</p>
+    }
+</section>

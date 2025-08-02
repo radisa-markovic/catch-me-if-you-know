@@ -1,35 +1,4 @@
 <h1 class="center">Stigni me ako znas - kviz</h1>
+<app-question-form/>
+<app-board />
 <router-outlet />
-<section class="center">
-    @if(this.playerCanStillAnswer() && this.questionSet) {
-    <form
-        #answerForm="ngForm"
-        (ngSubmit)="onAnswerGiven(answerForm)"
-    >
-        <time>{{answerTimer}}</time>
-        <h2>{{questionSet[currentQuestionNumber].content }}</h2>
-        <input
-            type="text"
-            name="enteredAnswer"
-            id="answerInput"
-            [(ngModel)]="enteredAnswer"
-        />
-        <button type="submit">
-            Potvrdi
-        </button>
-    </form>
-    <button (click)="onPassQuestion()">
-        Dalje
-    </button>
-    }
-    @else
-    {
-    <p>Gotov set od 6 pitanja</p>
-    }
-    @if(this.playerCanStillAnswer()) {
-    <p>Moze da se odgovara</p>
-    }
-    @else {
-    <p>Ne moze da se odgovara</p>
-    }
-</section>

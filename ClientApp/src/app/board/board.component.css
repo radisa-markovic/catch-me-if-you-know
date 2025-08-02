@@ -1,0 +1,36 @@
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(7, 1fr);
+    gap: 5px;
+    list-style: none;
+    padding-left: 0;
+    margin: auto;
+    max-width: 20rem;
+}
+
+.game-field {
+    border: 2px solid black;
+    text-align: center;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.board-billboard
+{
+    border: 2px solid black;
+    text-align: center;
+    grid-column: span 5;
+    grid-row: span 5;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.orange-color
+{
+    background-color: orange;
+}

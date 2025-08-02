@@ -1,0 +1,27 @@
+<ul class="game-board">
+    @for(i of [].constructor(25).keys(); track i) {
+        @if(i !== 8)
+        {
+
+            <li 
+                class="game-field"
+                [attr.data-field-id]="this.calculateIndex(i)"
+                #boardField
+            >
+                @if(i < 7) {
+                    {{ i }}
+                } @else if(isFarLeftIndex(i)) {
+                    {{  23 - this.farLeftIndexes.indexOf(i) }}
+                } @else if(isFarRightIndex(i)) {
+                    {{ (i - 9) / 2 + 7 }}
+                } @else if(isBottomIndex(i)) {
+                    {{ 36 - i }}
+                }
+            </li>
+        } @else {
+            <li class="board-billboard">
+                {{ i }}
+            </li>
+        }
+    }
+</ul>
