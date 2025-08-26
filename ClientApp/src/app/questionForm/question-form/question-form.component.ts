@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { Question } from '../../app.component';
 import { FormsModule, NgForm } from '@angular/forms';
 import { AnswersService } from '../../answers.service';
-
+import { SignalRService } from '../../signal-r.service';
+import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-question-form',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './question-form.component.html',
   styleUrl: './question-form.component.css'
 })
@@ -20,9 +21,27 @@ export class QuestionFormComponent implements OnInit {
   QUESTION_SET_LIMIT: number = 6;//zero-based index
   timerId: any;
 
-  constructor(private answersService: AnswersService) {}
+  playerId: number = -1;
+  playerColor: string = "blue";
+
+  constructor(
+    private answersService: AnswersService,
+    private signalRService: SignalRService
+  ) {}
 
   async ngOnInit(): Promise<void> {
+    await this.signalRService.startConnection();
+    this.signalRService.receiveIdFromServer();
+
+    this.signalRService.playerId$.subscribe((playerId) => {
+      this.playerId = parseInt(playerId);
+
+      if(this.playerId === 1) this.playerColor = "blue";
+      if(this.playerId === 2) this.playerColor = "red";
+      if(this.playerId === 3) this.playerColor = "yellow";
+      if(this.playerId === 4) this.playerColor = "green";
+    });
+
     this.answersService.currentQuestionSet.subscribe((questionSet) => {
       if(this.timerId) //to clear holdout intervals
         clearInterval(this.timerId);

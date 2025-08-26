@@ -1,4 +1,12 @@
-<section class="center">
+<section 
+    class="center"
+    [ngClass]="{
+        'bg-blue': playerColor === 'cyan',
+        'bg-red': playerColor === 'red',
+        'bg-green': playerColor === 'green',
+        'bg-yellow': playerColor === 'yellow',
+    }"
+>
     @if(this.playerCanStillAnswer() && this.questionSet.length !== 0) {
     <form
         #answerForm="ngForm"
