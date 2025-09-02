@@ -30,18 +30,6 @@ export class QuestionFormComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    await this.signalRService.startConnection();
-    this.signalRService.receiveIdFromServer();
-
-    this.signalRService.playerId$.subscribe((playerId) => {
-      this.playerId = parseInt(playerId);
-
-      if(this.playerId === 1) this.playerColor = "blue";
-      if(this.playerId === 2) this.playerColor = "red";
-      if(this.playerId === 3) this.playerColor = "yellow";
-      if(this.playerId === 4) this.playerColor = "green";
-    });
-
     this.answersService.currentQuestionSet.subscribe((questionSet) => {
       if(this.timerId) //to clear holdout intervals
         clearInterval(this.timerId);

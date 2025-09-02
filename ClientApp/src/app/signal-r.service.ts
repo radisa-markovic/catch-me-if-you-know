@@ -1,15 +1,37 @@
 import { Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { environment } from '../environments/environment.development';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
+
+interface Player
+{
+  id: string;
+  username: string;
+  color?: string;
+  position?: number;
+}
+
+enum ServerQuizMethods
+{
+  SendIdToPlayer = "SendIdToPlayer",
+  ConfirmPlayerJoined = "ConfirmPlayerJoined",
+  NewPlayerJoined = "NewPlayerJoined"
+}
+
+enum InvokableQuizMethods
+{
+  JoinQuiz = "JoinQuiz"
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class SignalRService {
   private hubConnection: HubConnection;
-  private playerIdSubject: Subject<string> = new Subject<string>();
-  public playerId$ = this.playerIdSubject.asObservable();
+  public currentUsername: string = "";
+
+  private playersSubject = new BehaviorSubject<Player[]>([]);
+  public players$ = this.playersSubject.asObservable();
   
   constructor() 
   {
@@ -17,24 +39,47 @@ export class SignalRService {
       .withUrl(`${environment.API_BASE}/questionsHub`, {
         withCredentials: false
       })
+      .withAutomaticReconnect()
       .build();
+
+    this.setupSignalREvents();
+    this.startConnection();
   }
 
-  public async startConnection()
+  private setupSignalREvents()
+  {
+    this.onQuizJoined();
+    this.onPlayerJoined();
+  }
+
+  private async startConnection()
   {
     await this.hubConnection.start()
       .then(() => {
         console.log("SignalR connected");
-        this.receiveIdFromServer();
       })
       .catch((error) => console.error("Error with connection: " + error))
   }
 
-  public receiveIdFromServer()
+  public async joinQuiz(username: string)
   {
-    this.hubConnection.on("SendIdToPlayer", (id) => {
-      console.log("ID igraca: " + id);
-      this.playerIdSubject.next(id);
+    await this.hubConnection.invoke(InvokableQuizMethods.JoinQuiz, username);
+    this.currentUsername = username;
+  }
+
+  public async onPlayerJoined()
+  {
+    this.hubConnection.on(ServerQuizMethods.NewPlayerJoined, (players: Player[]) => {
+      console.log(players);
+      this.playersSubject.next(players);
+    });
+  }
+
+  public async onQuizJoined()
+  {
+    this.hubConnection.on(ServerQuizMethods.ConfirmPlayerJoined, (username: string) => {
+      console.log("Uspesno ste se pridruzili kvizu kao: " + username);
+      this.currentUsername = username;
     });
   }
 }
