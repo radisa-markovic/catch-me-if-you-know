@@ -1,5 +1,6 @@
 import { Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { AnswersService } from '../answers.service';
+import { SignalRService } from '../signal-r.service';
 
 @Component({
   selector: 'app-board',
@@ -17,7 +18,10 @@ export class BoardComponent implements OnInit {
 
     @ViewChildren('boardField') boardFields!: QueryList<ElementRef>;
 
-    constructor(private answersService: AnswersService) { }
+    constructor(
+        private answersService: AnswersService,
+        private signalRService: SignalRService    
+    ) { }
 
     ngOnInit(): void {
         this.answersService.currentInfo.subscribe((currentInfo) => {
@@ -40,6 +44,15 @@ export class BoardComponent implements OnInit {
                         element.nativeElement.classList.add("orange-color");
                     }, index * 500);
                 });
+            }
+        });
+
+        this.signalRService.fieldMovement$.subscribe((numberOfFields) => {
+            this.numberOfFieldsToAdvance = numberOfFields;  
+            this.currentPositionForPlayer += numberOfFields;
+            for(let i=0; i < this.numberOfFieldsToAdvance; i++)
+            {
+                this.boardFields.get(i)?.nativeElement.classList.add("orange-color");
             }
         });
     }

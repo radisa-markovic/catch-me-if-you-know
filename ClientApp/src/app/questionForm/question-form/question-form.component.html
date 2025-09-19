@@ -11,22 +11,36 @@
     <form
         #answerForm="ngForm"
         (ngSubmit)="onAnswerGiven(answerForm)"
+        class="question-form"
     >
-        <time>{{answerTimer}}</time>
-        <h2>{{questionSet[currentQuestionNumber].content }}</h2>
+        <time class="timer" [ngClass]="{'time-out': answerTimer <= 5}">
+            {{answerTimer}}
+        </time>
+        <h2 class="question-content">
+            {{questionSet[currentQuestionNumber].content }}
+        </h2>
         <input
             type="text"
             name="enteredAnswer"
             id="answerInput"
             [(ngModel)]="enteredAnswer"
         />
-        <button type="submit">
-            Potvrdi
-        </button>
+        <div class="button-row">
+            <button 
+                type="submit"
+                class="confirm-button"
+            >
+                Potvrdi
+            </button>
+            <button 
+                (click)="onPassQuestion(questionSet[currentQuestionNumber].id)"
+                type="button"
+                class="pass-button"
+            >
+                Dalje
+            </button>
+        </div>
     </form>
-    <button (click)="onPassQuestion()">
-        Dalje
-    </button>
     }
     @else
     {

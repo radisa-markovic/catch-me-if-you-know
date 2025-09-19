@@ -15,9 +15,8 @@ export class QuestionFormComponent implements OnInit {
   questionSet: Question[] = [];
   currentQuestionNumber: number = 0;
   answerTimer: number = 30;
-  givenAnswers: string[] = [];
+  givenAnswers: {id: number, givenAnswer: string}[] = [];
   enteredAnswer: string = "";
-  stepsForward: number = 0;
   QUESTION_SET_LIMIT: number = 6;//zero-based index
   timerId: any;
 
@@ -30,7 +29,11 @@ export class QuestionFormComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    this.answersService.currentQuestionSet.subscribe((questionSet) => {
+    this.signalRService.questions$.subscribe((questionSet) => {
+      this.answerTimer = 30;
+      this.currentQuestionNumber = 0;
+      this.givenAnswers = [];
+
       if(this.timerId) //to clear holdout intervals
         clearInterval(this.timerId);
       
@@ -39,7 +42,7 @@ export class QuestionFormComponent implements OnInit {
         this.questionSet = questionSet;
         this.timerId = setInterval(() => {
           this.answerTimer--;
-          if(this.answerTimer === 0 || this.currentQuestionNumber === this.QUESTION_SET_LIMIT)
+          if(this.questionsAnsweredOrIntervalExpired())
           {
             clearInterval(this.timerId);   
           }
@@ -49,13 +52,20 @@ export class QuestionFormComponent implements OnInit {
   
   }
 
+  questionsAnsweredOrIntervalExpired(): boolean {
+    return this.currentQuestionNumber === this.QUESTION_SET_LIMIT || this.answerTimer === 0;
+  }
+
   playerCanStillAnswer(): boolean {
     return this.currentQuestionNumber < this.QUESTION_SET_LIMIT && this.answerTimer !== 0;
   }
   
   onAnswerGiven(form: NgForm) {
     if (this.currentQuestionNumber !== this.QUESTION_SET_LIMIT) {
-      this.givenAnswers.push(form.value['enteredAnswer']);
+      this.givenAnswers.push({
+        id: this.questionSet[this.currentQuestionNumber].id,
+        givenAnswer: form.value['enteredAnswer']
+      });
       this.currentQuestionNumber++;
     }
     this.enteredAnswer = '';
@@ -71,8 +81,12 @@ export class QuestionFormComponent implements OnInit {
     }
   }
 
-  onPassQuestion() {
-    this.givenAnswers.push("");
+  onPassQuestion(id: number) {
+    debugger;
+    this.givenAnswers.push({
+      id: id,
+      givenAnswer: ""
+    });
     this.currentQuestionNumber++;
   }
 
@@ -88,20 +102,9 @@ export class QuestionFormComponent implements OnInit {
       return;
     }
 
-    this.questionSet?.forEach((question, questionNumber) => {
-      if (
-        this.givenAnswers[questionNumber] &&
-        this.givenAnswers[questionNumber].toLowerCase().trim() === question.answer.toLowerCase()
-      ) {
-        this.stepsForward++;
-      }
-    });
-
-    this.answersService.emitPlayerInfo({
-      currentPlayerId: 0, //needs logic for dynamic selection later
-      currentPlayerPosition: 0,
-      numberOfCorrectAnswers: this.stepsForward
-    });
-    this.stepsForward = 0;
+    this.signalRService.submitAnswers(
+      this.signalRService.currentUsername,
+      this.givenAnswers
+    );
   }
 }

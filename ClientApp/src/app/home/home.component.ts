@@ -17,7 +17,6 @@ export class HomeComponent {
   ) { }
 
   async onNameEntered(name: string) {
-    console.log("Uneto ime: " + name);
     await this.signalRService.joinQuiz(name);
     this.router.navigate(['/quiz']);
   }

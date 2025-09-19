@@ -13,6 +13,8 @@ import { SignalRService } from '../signal-r.service';
 export class QuizPageComponent implements OnInit{
   public usernames: string[] = [];
   public loggedInUsername: string = this.signalRService.currentUsername;
+  public gameHasSterted: boolean = false;
+  public currentlyAnsqweringUsername: string = "";
 
   constructor(
     private signalRService: SignalRService
@@ -24,5 +26,18 @@ export class QuizPageComponent implements OnInit{
       this.usernames = Object.keys(players);
       // this.usernames = players.map(player => player.username);
     });
+
+    this.signalRService.gameHasStarted$.subscribe(started => {
+      this.gameHasSterted = started;
+    });
+
+    this.signalRService.userWhoIsAnswerring$.subscribe(username => {
+      console.log("Trenutno odgovara: " + username);
+      this.currentlyAnsqweringUsername = username;
+    });
+  }
+
+  userIsAnswering(): boolean {
+    return this.currentlyAnsqweringUsername === this.loggedInUsername;
   }
 }

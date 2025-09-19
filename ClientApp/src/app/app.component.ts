@@ -9,7 +9,6 @@ import { HomeComponent } from "./home/home.component";
 export interface Question {
   id: number,
   content: string,
-  answer: string
 }
 
 @Component({
